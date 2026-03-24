@@ -4,13 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 def plot_full_correlation_heatmap(df, figsize=(16, 14)):
-    """
-    Построение полной тепловой карты корреляций для всех числовых признаков
 
-    Parameters:
-    df (DataFrame): исходный датафрейм
-    figsize (tuple): размер графика
-    """
     # Выбираем только числовые столбцы
     numeric_df = df.select_dtypes(include=[np.number])
 
@@ -38,24 +32,12 @@ def plot_full_correlation_heatmap(df, figsize=(16, 14)):
 
 
 def plot_high_correlation_heatmap(df, threshold=0.35, figsize=None):
-    """
-    Построение тепловой карты корреляций для признаков с высокой корреляцией
 
-    Parameters:
-    df (DataFrame): исходный датафрейм
-    threshold (float): порог корреляции для отбора признаков
-    figsize (tuple): размер графика (если None, будет вычислен автоматически)
-    """
     # Выбираем только числовые столбцы
     numeric_df = df.select_dtypes(include=[np.number])
 
     # Рассчитываем корреляционную матрицу
     correlation_matrix = numeric_df.corr()
-
-    # Проверяем наличие целевой переменной
-    if 'TARGET_deathRate' not in correlation_matrix.columns:
-        print("⚠️ Столбец 'TARGET_deathRate' не найден в данных")
-        return
 
     # Получаем корреляции с целевой переменной
     target_correlations = correlation_matrix['TARGET_deathRate'].sort_values(ascending=False)
@@ -94,7 +76,7 @@ def plot_high_correlation_heatmap(df, threshold=0.35, figsize=None):
                     annot_kws={"size": 9})
 
         plt.title(
-            f'Тепловая карта корреляций признаков\nс корреляцией > {threshold * 100:.0f}% (всего {len(high_corr_features)} признаков + TARGET_deathRate)',
+            f'Тепловая карта корреляций признаков\nс корреляцией > {threshold * 100:.0f}',
             fontsize=14, pad=20)
         plt.xticks(rotation=45, ha='right', fontsize=10)
         plt.yticks(fontsize=10)
@@ -102,24 +84,24 @@ def plot_high_correlation_heatmap(df, threshold=0.35, figsize=None):
         plt.show()
 
         # Выводим информацию об отобранных признаках
-        print(f"\n🎯 ПРИЗНАКИ С КОРРЕЛЯЦИЕЙ > {threshold * 100:.0f}% (|r| > {threshold}):")
+        print(f"\n ПРИЗНАКИ С КОРРЕЛЯЦИЕЙ > {threshold * 100:.0f}% (|r| > {threshold}):")
         print("=" * 70)
         print(f"Всего отобрано {len(high_corr_features)} признаков для построения модели")
         print()
 
         if positive_features:
-            print("📈 ПОЛОЖИТЕЛЬНАЯ КОРРЕЛЯЦИЯ (увеличивают смертность):")
+            print(" ПОЛОЖИТЕЛЬНАЯ КОРРЕЛЯЦИЯ (увеличивают смертность):")
             for feature in positive_features:
                 print(f"  {feature:35} | {target_correlations[feature]:.4f}")
             print()
 
         if negative_features:
-            print("📉 ОТРИЦАТЕЛЬНАЯ КОРРЕЛЯЦИЯ (снижают смертность):")
+            print(" ОТРИЦАТЕЛЬНАЯ КОРРЕЛЯЦИЯ (снижают смертность):")
             for feature in negative_features:
                 print(f"  {feature:35} | {target_correlations[feature]:.4f}")
 
     else:
-        print(f"\n⚠️ Нет признаков с корреляцией > {threshold * 100:.0f}%")
+        print(f"\n Нет признаков с корреляцией > {threshold * 100:.0f}%")
         # Показываем топ-5 признаков
         top_features = target_correlations[1:6].index.tolist() + target_correlations.tail(5).index.tolist()
         all_features = ['TARGET_deathRate'] + top_features
@@ -140,7 +122,7 @@ def plot_high_correlation_heatmap(df, threshold=0.35, figsize=None):
                     cbar_kws={"shrink": 0.8, "label": "Коэффициент корреляции"},
                     annot_kws={"size": 9})
 
-        plt.title(f'Тепловая карта корреляций (топ-5 признаков)\nнет признаков с корреляцией > {threshold * 100:.0f}%',
+        plt.title(f'Тепловая карта корреляций \nнет признаков с корреляцией > {threshold * 100:.0f}%',
                   fontsize=14, pad=20)
         plt.xticks(rotation=45, ha='right', fontsize=10)
         plt.yticks(fontsize=10)
@@ -149,15 +131,9 @@ def plot_high_correlation_heatmap(df, threshold=0.35, figsize=None):
 
 
 def plot_all_heatmaps(df, threshold=0.35):
-    """
-    Построение обеих тепловых карт
 
-    Parameters:
-    df (DataFrame): исходный датафрейм
-    threshold (float): порог корреляции для отбора признаков
-    """
     print("\n" + "=" * 80)
-    print("📊 ПОСТРОЕНИЕ ТЕПЛОВЫХ КАРТ КОРРЕЛЯЦИЙ")
+    print(" ПОСТРОЕНИЕ ТЕПЛОВЫХ КАРТ КОРРЕЛЯЦИЙ")
     print("=" * 80)
 
     print("\n1. Полная тепловая карта всех числовых признаков:")
@@ -165,5 +141,3 @@ def plot_all_heatmaps(df, threshold=0.35):
 
     print("\n2. Детальная тепловая карта признаков с высокой корреляцией:")
     plot_high_correlation_heatmap(df, threshold)
-
-    print("\n✅ Все тепловые карты построены!")
